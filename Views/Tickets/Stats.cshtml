@@ -1,0 +1,75 @@
+@{
+    ViewData["Title"] = "Statistika";
+    int total = ViewBag.Total;
+    var byCategory = (Dictionary<string, int>)ViewBag.ByCategory;
+    var byPriority = (Dictionary<string, int>)ViewBag.ByPriority;
+    var byStatus = (Dictionary<string, int>)ViewBag.ByStatus;
+}
+
+@functions {
+    static int Percent(int value, int total) =>
+        total == 0 ? 0 : (int)Math.Round(value * 100.0 / total);
+}
+
+<div class="container mt-4">
+    <h2>Müraciət statistikası</h2>
+    <p class="text-muted">Ümumi müraciət sayı: <strong>@total</strong></p>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <h5>Kateqoriya üzrə</h5>
+                @foreach (var kv in byCategory)
+                {
+                    <div class="mt-2">
+                        <div class="d-flex justify-content-between">
+                            <span>@kv.Key</span><span>@kv.Value</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width:@Percent(kv.Value, total)%"></div>
+                        </div>
+                    </div>
+                }
+                @if (!byCategory.Any()) { <p class="text-muted mb-0">Məlumat yoxdur.</p> }
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <h5>Prioritet üzrə</h5>
+                @foreach (var kv in byPriority)
+                {
+                    <div class="mt-2">
+                        <div class="d-flex justify-content-between">
+                            <span>@kv.Key</span><span>@kv.Value</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-danger" style="width:@Percent(kv.Value, total)%"></div>
+                        </div>
+                    </div>
+                }
+                @if (!byPriority.Any()) { <p class="text-muted mb-0">Məlumat yoxdur.</p> }
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <h5>Status üzrə</h5>
+                @foreach (var kv in byStatus)
+                {
+                    <div class="mt-2">
+                        <div class="d-flex justify-content-between">
+                            <span>@kv.Key</span><span>@kv.Value</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" style="width:@Percent(kv.Value, total)%"></div>
+                        </div>
+                    </div>
+                }
+                @if (!byStatus.Any()) { <p class="text-muted mb-0">Məlumat yoxdur.</p> }
+            </div>
+        </div>
+    </div>
+
+    <a asp-action="Index" class="btn btn-secondary mt-4">Geri</a>
+</div>

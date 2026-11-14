@@ -1,0 +1,17 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Xəta";
+}
+
+<div class="container mt-4">
+    <h1 class="text-danger">Xəta baş verdi.</h1>
+    <h2 class="text-danger">Sorğunu icra etmək mümkün olmadı.</h2>
+
+    @if (Model.ShowRequestId)
+    {
+        <p>
+            <strong>Request ID:</strong> <code>@Model.RequestId</code>
+        </p>
+    }
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Ana səhifəyə qayıt</a>
+</div>

@@ -1,0 +1,121 @@
+@model IEnumerable<HelpDeskWeb.Models.Ticket>
+
+@{
+    ViewData["Title"] = "Müraciətlər";
+    int currentPage = ViewBag.Page;
+    int totalPages = ViewBag.TotalPages;
+
+    string StatusBadge(string s) => s switch
+    {
+        "New" => "bg-primary",
+        "In Progress" => "bg-warning text-dark",
+        "Resolved" => "bg-success",
+        "Closed" => "bg-secondary",
+        _ => "bg-light text-dark"
+    };
+
+    string PriorityBadge(string p) => p switch
+    {
+        "High" => "bg-danger",
+        "Normal" => "bg-info text-dark",
+        "Low" => "bg-secondary",
+        _ => "bg-light text-dark"
+    };
+}
+
+<div class="container mt-4">
+    <h2>Texniki dəstək müraciətləri</h2>
+    <p class="text-muted">Ümumi müraciət sayı: <strong>@ViewBag.TotalCount</strong></p>
+
+    <a asp-action="Create"
+       class="btn btn-primary mb-3">
+        Yeni müraciət yarat
+    </a>
+    <a asp-action="Stats" class="btn btn-outline-secondary mb-3">Statistika</a>
+    <a asp-action="ExportCsv" class="btn btn-outline-success mb-3">CSV yüklə</a>
+
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Başlıq</th>
+                <th>Müraciət edən</th>
+                <th>Kateqoriya</th>
+                <th>Prioritet</th>
+                <th>Status</th>
+                <th>Əməliyyatlar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Title</td>
+                    <td>
+                        @item.ReporterName<br />
+                        <small class="text-muted">@item.ReporterEmail</small>
+                    </td>
+                    <td>@item.Category</td>
+                    <td><span class="badge @PriorityBadge(item.Priority)">@item.Priority</span></td>
+                    <td>
+                        <span class="badge @StatusBadge(item.Status) mb-1">@item.Status</span>
+                        <form asp-action="ChangeStatus" method="post" class="d-flex gap-1">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <input type="hidden" name="page" value="@currentPage" />
+                            <select name="status" class="form-select form-select-sm">
+                                <option value="New" selected="@(item.Status == "New")">New</option>
+                                <option value="In Progress" selected="@(item.Status == "In Progress")">In Progress</option>
+                                <option value="Resolved" selected="@(item.Status == "Resolved")">Resolved</option>
+                                <option value="Closed" selected="@(item.Status == "Closed")">Closed</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-outline-dark">OK</button>
+                        </form>
+                    </td>
+                    <td>
+                        <a asp-action="Details"
+                           asp-route-id="@item.Id"
+                           class="btn btn-info btn-sm">
+                            Ətraflı
+                        </a>
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Id"
+                           class="btn btn-warning btn-sm">
+                            Redaktə
+                        </a>
+                        <a asp-action="Delete"
+                           asp-route-id="@item.Id"
+                           class="btn btn-danger btn-sm">
+                            Sil
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Any())
+    {
+        <p>Hələ müraciət yaradılmayıb.</p>
+    }
+
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)">&laquo;</a>
+                </li>
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)">&raquo;</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
